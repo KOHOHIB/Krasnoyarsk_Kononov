@@ -1,0 +1,85 @@
+import random
+import pygame
+import time
+
+pygame.init()
+
+
+class Settings:
+    is_shoot = False
+    is_game_active = True
+    is_menu_active = False
+    score = 0
+    health = 3
+    f1 = pygame.font.Font(None, 90)
+    f2 = pygame.font.Font(None, 36)
+    f3 = pygame.font.Font(None, 180)
+
+
+class Health:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.my_image = None
+        self.has_image = False
+
+    def add_image(self, path_to_image):
+        self.my_image = pygame.transform.scale(pygame.image.load(path_to_image), (50, 50))
+
+    def draw(self, screen1):
+        screen1.blit(self.my_image, (self.x, self.y))
+
+
+class Projectile:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = 3
+        self.my_image = None
+
+    def add_image(self, path_to_image):
+        self.my_image = pygame.image.load(path_to_image)
+        self.my_image = pygame.transform.scale(self.my_image, (100, 100))
+
+    def rotate(self, degree):
+        self.my_image = pygame.transform.rotate(self.my_image, degree)
+
+    def draw(self, screen):
+        screen.blit(self.my_image, (self.x, self.y))
+
+    def check_collision(self, enemy_collision_list, projectile_list):
+        for enemy_collision in enemy_collision_list:
+            for projectile_collision in projectile_list:
+
+                if enemy_collision.x <= projectile_collision.x + 100 <= enemy_collision.x + 100:
+                    if enemy_collision.y <= projectile_collision.y <= enemy_collision.y + 100:
+                        if type(enemy_collision) is Hero:
+                            projectile_list.remove(projectile_collision)
+                            Settings.health -= 1
+                            healths.pop(-1)
+                            exp = Explosion(hero.x, hero.y)
+                            exps.append(exp)
+                            pygame.mixer.music.load("sound2.mp3")
+                            pygame.mixer.music.play()
+                        else:
+                            projectile_list.remove(projectile_collision)
+                            if type(enemy_collision) is Enemy:
+                                exp = Explosion(enemy_collision.x, enemy_collision.y)
+                                exps.append(exp)
+                                pygame.mixer.music.load("sound2.mp3")
+                                pygame.mixer.music.play()
+                                enemy_collision_list.remove(enemy_collision)
+                                Settings.score += 100
+                            if type(enemy_collision) is Boss:
+                                exp = Explosion(enemy_collision.x, enemy_collision.y)
+                                exps.append(exp)
+                                pygame.mixer.music.load("sound2.mp3")
+                                pygame.mixer.music.play()
+                                enemy_collision.hp -= 1
+                                Settings.score += 1000
+
+    def move_up(self):
+        self.y -= self.speed
+
+    def move_down(self):
+        self.y += self.speed * 3
