@@ -1,0 +1,164 @@
+class Explosion:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.size = 5
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.size, self.size))
+        self.size += 4
+        self.x -= 2
+        self.y -= 2
+
+
+def main_menu(screen_function):
+    selected = 'start'
+    while Settings.is_menu_active:
+        screen.fill(blue)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    Settings.is_menu_active = False
+
+                if event.key == pygame.K_DOWN:
+                    if selected == 'start':
+                        selected = 'quit'
+                    elif selected == 'quit':
+                        selected = 'shop'
+                    elif selected == 'shop':
+                        selected = 'start'
+
+                if event.key == pygame.K_UP:
+                    if selected == 'start':
+                        selected = 'shop'
+                    elif selected == 'quit':
+                        selected = 'start'
+                    elif selected == 'shop':
+                        selected = 'quit'
+
+                if event.key == pygame.K_RETURN:
+                    if selected == 'start':
+                        Settings.is_menu_active = False
+                    elif selected == 'quit':
+                        quit()
+                    elif selected == 'shop':
+                        shop_menu()
+
+        if selected == 'start':
+            title_text = Settings.f3.render('Space shooter', True, red)
+            start_text = Settings.f1.render('Играть', True, white)
+            quit_text = Settings.f1.render('Выйти', True, black)
+            shop_text = Settings.f1.render('Магазин', True, black)
+        if selected == 'quit':
+            title_text = Settings.f3.render('Space shooter', True, red)
+            start_text = Settings.f1.render('Играть', True, black)
+            quit_text = Settings.f1.render('Выйти', True, white)
+            shop_text = Settings.f1.render('Магазин', True, black)
+        if selected == 'shop':
+            title_text = Settings.f3.render('Space shooter', True, red)
+            start_text = Settings.f1.render('Играть', True, black)
+            quit_text = Settings.f1.render('Выйти', True, black)
+            shop_text = Settings.f1.render('Магазин', True, white)
+
+        screen.blit(title_text, (500, 100))
+        screen.blit(start_text, (700, 300))
+        screen.blit(quit_text, (700, 500))
+        screen.blit(shop_text, (700, 700))
+        clock.tick(fps)
+        pygame.display.update()
+
+
+def shop_menu():
+    selected = 'quit'
+    while Settings.is_menu_active:
+        screen.fill(blue)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    Settings.is_menu_active = False
+
+                if event.key == pygame.K_DOWN:
+                    if selected == 'quit':
+                        selected = 'health'
+                    elif selected == 'health':
+                        selected = 'skin1'
+                    elif selected == 'skin1':
+                        selected = 'skin2'
+                    elif selected == 'skin2':
+                        selected = 'speed'
+                    elif selected == 'speed':
+                        selected = 'quit'
+
+                if event.key == pygame.K_UP:
+                    if selected == 'quit':
+                        selected = 'speed'
+                    elif selected == 'health':
+                        selected = 'quit'
+                    elif selected == 'skin1':
+                        selected = 'health'
+                    elif selected == 'skin2':
+                        selected = 'skin1'
+                    elif selected == 'speed':
+                        selected = 'skin2'
+
+                if event.key == pygame.K_RETURN:
+                    if selected == 'quit':
+                        break
+                    elif selected == 'health' and Settings.score >= 100:
+                        Settings.health += 1
+                        health = Health(len(healths) * 60, 0)
+                        health.add_image('pngegg.png')
+                        healths.append(health)
+                        Settings.score -= 100
+                    elif selected == 'skin1' and Settings.score >= 500:
+                        hero.add_image("ship.png")
+                        Settings.score -= 500
+                    elif selected == 'skin2' and Settings.score >= 500:
+                        hero.add_image("ship2.png")
+                        Settings.score -= 500
+                    elif selected == "speed" and Settings.score >= 100:
+                        hero.speed += 1
+                        Settings.score -= 100
+
+        if selected == 'quit':
+            quit_text = Settings.f1.render('Выйти', True, white)
+            health_text = Settings.f1.render('Хп', True, black)
+            skin1_text = Settings.f1.render('Скин1', True, black)
+            skin2_text = Settings.f1.render('Скин2', True, black)
+            speed_text = Settings.f1.render('Скорость', True, black)
+        if selected == 'health':
+            quit_text = Settings.f1.render('Выйти', True, black)
+            health_text = Settings.f1.render('Хп', True, white)
+            skin1_text = Settings.f1.render('Скин1', True, black)
+            skin2_text = Settings.f1.render('Скин2', True, black)
+            speed_text = Settings.f1.render('Скорость', True, black)
+        if selected == 'skin1':
+            quit_text = Settings.f1.render('Выйти', True, black)
+            health_text = Settings.f1.render('Хп', True, black)
+            skin1_text = Settings.f1.render('Скин1', True, white)
+            skin2_text = Settings.f1.render('Скин2', True, black)
+            speed_text = Settings.f1.render('Скорость', True, black)
+        if selected == 'skin2':
+            quit_text = Settings.f1.render('Выйти', True, black)
+            health_text = Settings.f1.render('Хп', True, black)
+            skin1_text = Settings.f1.render('Скин1', True, black)
+            skin2_text = Settings.f1.render('Скин2', True, white)
+            speed_text = Settings.f1.render('Скорость', True, black)
+        if selected == 'speed':
+            quit_text = Settings.f1.render('Выйти', True, black)
+            health_text = Settings.f1.render('Хп', True, black)
+            skin1_text = Settings.f1.render('Скин1', True, black)
+            skin2_text = Settings.f1.render('Скин2', True, black)
+            speed_text = Settings.f1.render('Скорость', True, white)
+
+        screen.blit(quit_text, (700, 100))
+        screen.blit(health_text, (700, 300))
+        screen.blit(skin1_text, (700, 500))
+        screen.blit(skin2_text, (700, 700))
+        screen.blit(speed_text, (700, 900))
+        clock.tick(fps)
+        pygame.display.update()
