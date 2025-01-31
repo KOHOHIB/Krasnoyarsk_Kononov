@@ -1,0 +1,151 @@
+WIDTH = 1920
+HEIGHT = 1080
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+fps = 60
+
+
+clock = pygame.time.Clock()
+is_right = False
+is_left = False
+is_game_active = True
+pygame.mixer.init()
+
+
+enemies = list()
+projectiles = list()
+enemy_projectiles = list()
+bosses = list()
+healths = list()
+heroes = list()
+exps = list()
+
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+lime = (0, 255, 0)
+blue = (0, 0, 255)
+yellow = (255, 255, 0)
+
+score = 0
+
+f4 = pygame.font.Font(None, 90)
+game_over_text = f4.render('Вы проиграли', True, red)
+win = f4.render('Вы выиграли', True, lime)
+
+Settings.is_menu_active = True
+main_menu(screen)
+
+hero = Hero(0, 950)
+boss = 0
+heroes.append(hero)
+for i in range(14):
+    for j in range(4):
+        enemy = Enemy(50 + i * 130, 100 + j * 130)
+        enemy.add_image('pngegg1.png')
+        enemies.append(enemy)
+
+for health_i in range(Settings.health):
+    health = Health(health_i * 60, 0)
+    health.add_image("pngegg.png")
+    healths.append(health)
+
+hero.add_image('pngegg.png')
+while is_game_active:
+    screen.fill(black)
+
+    text1 = Settings.f2.render('Счёт:' + str(Settings.score), True, red)
+    screen.blit(text1, (250, 30))
+
+    # действия со всеми объектами
+    for enemy1 in enemies:
+        enemy1.draw(screen)
+        enemy1.check()
+        if enemy1.napravlenie == "left":
+            enemy1.move_left()
+        else:
+            enemy1.move_right()
+        a = random.randint(0, 1000)
+        if a == 0:
+            enemy_projectiles.append(enemy1.shoot())
+        if enemy1.y > 1040:
+            screen.fill(black)
+            screen.blit(game_over_text, (750, 450))
+            pygame.display.update()
+            time.sleep(5)
+            quit()
+    for boss1 in bosses:
+        boss1.draw(screen)
+        boss1.check()
+        if boss1.napravlenie == "left":
+            boss1.move_left()
+        else:
+            boss1.move_right()
+        a = random.randint(0, 20)
+        if a == 0:
+            enemy_projectiles.append(boss1.shoot())
+        if boss1.hp == 0:
+            screen.fill(black)
+            screen.blit(win, (750, 450))
+            pygame.display.update()
+            time.sleep(5)
+            quit()
+    for projectile1 in projectiles:
+        projectile1.draw(screen)
+        projectile1.move_up()
+        projectile1.check_collision(enemies, projectiles)
+        projectile1.check_collision(bosses, projectiles)
+    for exp in exps:
+        if exp.size < 100:
+            exp.draw(screen)
+        else:
+            exps.remove(exp)
+    for projectile1 in enemy_projectiles:
+        projectile1.draw(screen)
+        projectile1.move_down()
+        projectile1.check_collision(heroes, enemy_projectiles)
+
+    for health1 in healths:
+        health1.draw(screen)
+    if is_left:
+        hero.move_left()
+    if is_right:
+        hero.move_right()
+    hero.draw(screen)
+    # клавиши
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                is_left = True
+            if event.key == pygame.K_RIGHT:
+                is_right = True
+            if event.key == pygame.K_ESCAPE:
+                Settings.is_menu_active = True
+                main_menu(screen)
+            if event.key == pygame.K_SPACE:
+                projectile = Projectile(hero.x - 10, hero.y - 70)
+                projectile.add_image('projectile.png')
+                projectile.rotate(57)
+                projectiles.append(projectile)
+                pygame.mixer.music.load("sound.mp3")
+                pygame.mixer.music.play()
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                is_left = False
+            if event.key == pygame.K_RIGHT:
+                is_right = False
+
+    if len(enemies) == 0 and len(bosses) == 0:
+        boss = Boss(0, 0)
+        boss.add_image("pngegg.png")
+        bosses.append(boss)
+    if Settings.health == 0:
+        screen.fill(black)
+        screen.blit(game_over_text, (750, 450))
+        pygame.display.update()
+        time.sleep(5)
+        quit()
+    clock.tick(fps)
+    pygame.display.update()
